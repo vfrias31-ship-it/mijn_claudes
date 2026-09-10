@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>How AI reshapes your work</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #090D16;
+    --surface: #111A2D;
+    --surface-2: #17223B;
+    --surface-3: #1E2B48;
+    --border: #26324F;
+    --text: #E8ECF6;
+    --text-dim: #909CBC;
+    --text-faint: #5C6785;
+
+    --unchanged: #6B7694;
+    --unchanged-bg: rgba(107,118,148,0.12);
+    --augmented: #34D6C4;
+    --augmented-bg: rgba(52,214,196,0.10);
+    --automated: #9C8CFF;
+    --automated-bg: rgba(156,140,255,0.10);
+    --new: #FF9E6B;
+    --new-bg: rgba(255,158,107,0.10);
+
+    --radius: 10px;
+    --ease: cubic-bezier(.4,0,.2,1);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html,body{
+    margin:0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .mono{ font-family: 'IBM Plex Mono', monospace; }
+
+  .app{
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 48px 28px 80px;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    max-width: 640px;
+    margin-bottom: 40px;
+  }
+  .hero h1{
+    font-size: 34px;
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0 0 14px;
+  }
+  .hero p{
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-dim);
+    margin: 0;
+  }
+
+  /* ---------- Cards / sections ---------- */
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .section-title{
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 4px;
+  }
+  .section-hint{
+    font-size: 13px;
+    color: var(--text-faint);
+    margin: 0 0 14px;
+    line-height: 1.5;
+  }
+
+  /* ---------- Input rows ---------- */
+  .input-row{
+    display: flex;
+    gap: 10px;
+  }
+  .input-row input[type="text"]{
+    flex: 1;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color .15s var(--ease);
+  }
+  .input-row input[type="text"]::placeholder{ color: var(--text-faint); }
+  .input-row input[type="text"]:focus{ border-color: var(--augmented); }
+
+  button{
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+  }
+
+  .btn{
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 11px 18px;
+    border-radius: 8px;
+    white-space: nowrap;
+    transition: background .15s var(--ease), border-color .15s var(--ease);
+  }
+  .btn:hover{ background: #243252; border-color: #37456b; }
+  .btn:active{ transform: translateY(1px); }
+  .btn:focus-visible, input:focus-visible, .chip:focus-visible{
+    outline: 2px solid var(--augmented);
+    outline-offset: 2px;
+  }
+
+  .btn-primary{
+    background: var(--augmented);
+    border-color: var(--augmented);
+    color: #06201C;
+    font-weight: 600;
+  }
+  .btn-primary:hover{ background: #47e0cf; border-color: #47e0cf; }
+  .btn-primary:disabled{ opacity: .5; cursor: default; }
+  .btn-primary:disabled:hover{ background: var(--augmented); }
+
+  .link-btn{
+    background: none;
+    border: none;
+    color: var(--augmented);
+    font-size: 13px;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .example-note{
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--text-faint);
+  }
+
+  /* ---------- Stage / slider ---------- */
+  .stage-top{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .stage-label{
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .stage-narrative{
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.5;
+    max-width: 460px;
+    text-align: right;
+  }
+
+  .slider-row{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  .slider-endcap{
+    font-size: 11px;
+    color: var(--text-faint);
+    width: 46px;
+    flex-shrink: 0;
+  }
+  .slider-endcap.right{ text-align: right; }
+
+  input[type="range"]{
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--augmented) 0%, var(--automated) 100%);
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--text);
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--border);
+    cursor: pointer;
+    margin-top: -1px;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--text);
+    border: 3px solid var(--bg);
+    cursor: pointer;
+  }
+  input[type="range"]::-moz-range-track{
+    height: 4px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--augmented) 0%, var(--automated) 100%);
+  }
+
+  .play-controls{ display: flex; gap: 8px; }
+
+  /* ---------- Stacked bar ---------- */
+  .bar-wrap{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .bar{
+    flex: 1;
+    height: 34px;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+  }
+  .bar-seg{
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(0,0,0,0.55);
+    transition: width .5s var(--ease);
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .bar-seg.unchanged{ background: var(--unchanged); color: #0C0F16; }
+  .bar-seg.augmented{ background: var(--augmented); color: #06201C; }
+  .bar-seg.automated{ background: var(--automated); color: #17103B; }
+
+  .new-badge{
+    font-size: 12px;
+    color: var(--new);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .new-badge .mono{ font-weight: 500; }
+
+  /* ---------- Buckets ---------- */
+  .buckets{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 900px){
+    .buckets{ grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 560px){
+    .buckets{ grid-template-columns: 1fr; }
+  }
+
+  .bucket{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    min-height: 140px;
+    border-top: 3px solid var(--unchanged);
+  }
+  .bucket[data-cat="augmented"]{ border-top-color: var(--augmented); }
+  .bucket[data-cat="automated"]{ border-top-color: var(--automated); }
+  .bucket[data-cat="new"]{ border-top-color: var(--new); }
+
+  .bucket-head{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+  .dot{
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--unchanged); flex-shrink: 0;
+  }
+  .dot.augmented{ background: var(--augmented); }
+  .dot.automated{ background: var(--automated); }
+  .dot.new{ background: var(--new); }
+
+  .bucket-head .count{
+    margin-left: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+
+  .bucket-list{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 40px;
+  }
+  .bucket-empty{
+    font-size: 12px;
+    color: var(--text-faint);
+    font-style: normal;
+    padding: 6px 2px;
+  }
+
+  /* ---------- Task cards ---------- */
+  .task-card{
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--unchanged);
+    border-radius: 8px;
+    padding: 10px 10px 8px;
+    will-change: transform;
+  }
+  .task-card.cat-augmented{ border-left-color: var(--augmented); background: var(--augmented-bg); }
+  .task-card.cat-automated{ border-left-color: var(--automated); background: var(--automated-bg); }
+  .task-card.cat-new{ border-left-color: var(--new); background: var(--new-bg); }
+
+  .task-card.entering{
+    animation: enter .4s var(--ease);
+  }
+  @keyframes enter{
+    from{ opacity: 0; transform: scale(.9); }
+    to{ opacity: 1; transform: scale(1); }
+  }
+
+  .task-card.pending{
+    border-style: dashed;
+    opacity: .55;
+    background: var(--surface-2);
+  }
+  .pending-note{
+    font-size: 11px;
+    color: var(--text-faint);
+    margin-top: 6px;
+  }
+
+  .task-text{
+    font-size: 13.5px;
+    line-height: 1.4;
+    margin-bottom: 8px;
+    word-break: break-word;
+  }
+
+  .task-controls{
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .seg-btn{
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-faint);
+    font-size: 10.5px;
+    padding: 4px 7px;
+    border-radius: 5px;
+    transition: all .15s var(--ease);
+  }
+  .seg-btn:hover{ border-color: var(--text-dim); color: var(--text); }
+  .seg-btn.active[data-t="unchanged"]{ background: var(--unchanged); color: #0C0F16; border-color: var(--unchanged); }
+  .seg-btn.active[data-t="augmented"]{ background: var(--augmented); color: #06201C; border-color: var(--augmented); }
+  .seg-btn.active[data-t="automated"]{ background: var(--automated); color: #17103B; border-color: var(--automated); }
+
+  .remove-btn{
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    color: var(--text-faint);
+    font-size: 15px;
+    line-height: 1;
+    padding: 3px 5px;
+  }
+  .remove-btn:hover{ color: #FF6B6B; }
+
+  /* ---------- Footer ---------- */
+  .foot{
+    margin-top: 28px;
+    font-size: 12px;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  }
+
+  @media (max-width: 640px){
+    .stage-top{ flex-direction: column; }
+    .stage-narrative{ text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="hero">
+    <h1>See how AI could reshape your work</h1>
+    <p>List the processes your team runs today. Decide what AI keeps as-is, speeds up, or takes over completely. Then move the slider and watch the transition happen.</p>
+  </div>
+
+  <div class="card">
+    <div class="stage-top">
+      <div>
+        <div class="stage-label" id="stageLabel">Today</div>
+      </div>
+      <div class="stage-narrative" id="stageNarrative">Nothing has changed yet. Every process runs exactly as it does now.</div>
+    </div>
+    <div class="slider-row">
+      <span class="slider-endcap">Today</span>
+      <input type="range" id="adoptionSlider" min="0" max="100" value="0" aria-label="AI adoption level" />
+      <span class="slider-endcap right">Fully adopted</span>
+    </div>
+    <div class="play-controls">
+      <button class="btn btn-primary" id="playBtn">Play the transition</button>
+      <button class="btn" id="resetBtn">Reset to today</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Where your work stands</div>
+    <div class="section-hint">Share of your listed processes in each state, at the current adoption level.</div>
+    <div class="bar-wrap">
+      <div class="bar" id="stackedBar">
+        <div class="bar-seg unchanged" id="seg-unchanged" style="width:100%"></div>
+        <div class="bar-seg augmented" id="seg-augmented" style="width:0%"></div>
+        <div class="bar-seg automated" id="seg-automated" style="width:0%"></div>
+      </div>
+      <div class="new-badge" id="newBadge"><span class="mono">+0</span> new tasks appearing</div>
+    </div>
+  </div>
+
+  <div class="buckets" id="bucketArea">
+    <div class="bucket" data-cat="unchanged">
+      <div class="bucket-head"><span class="dot"></span>Same as today<span class="count" id="count-unchanged">0</span></div>
+      <div class="bucket-list" id="list-unchanged"></div>
+    </div>
+    <div class="bucket" data-cat="augmented">
+      <div class="bucket-head"><span class="dot augmented"></span>Augmented by AI<span class="count" id="count-augmented">0</span></div>
+      <div class="bucket-list" id="list-augmented"></div>
+    </div>
+    <div class="bucket" data-cat="automated">
+      <div class="bucket-head"><span class="dot automated"></span>Automated by AI<span class="count" id="count-automated">0</span></div>
+      <div class="bucket-list" id="list-automated"></div>
+    </div>
+    <div class="bucket" data-cat="new">
+      <div class="bucket-head"><span class="dot new"></span>New, AI-created work<span class="count" id="count-new">0</span></div>
+      <div class="bucket-list" id="list-new"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px;">
+    <div class="section-title">Your core processes</div>
+    <div class="section-hint">Add what your team actually does. Each one starts unchanged — use the buttons on the card to mark what you expect AI to do to it.</div>
+    <div class="input-row">
+      <input type="text" id="taskInput" placeholder="e.g. Drafting client compliance reports" />
+      <button class="btn" id="addTaskBtn">Add process</button>
+    </div>
+    <div class="example-note" id="exampleNote">Showing example processes — <button class="link-btn" id="clearExamples">clear them and map your own</button></div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">New tasks AI might create</div>
+    <div class="section-hint">Adopting AI usually adds oversight work that didn't exist before — reviewing its output, checking its decisions. These appear partway through the transition.</div>
+    <div class="input-row">
+      <input type="text" id="newTaskInput" placeholder="e.g. Reviewing AI-drafted reports before they go out" />
+      <button class="btn" id="addNewTaskBtn">Add new task</button>
+    </div>
+  </div>
+
+  <div class="foot">Illustrative model for discussion — thresholds are simplified, not a forecast.</div>
+
+</div>
+
+<script>
+(function(){
+  // ---------- State ----------
+  let uid = 0;
+  const nextId = () => 'p' + (uid++);
+
+  function hashOffset(id, spread){
+    let h = 0;
+    for(let i=0;i<id.length;i++){ h = (h*31 + id.charCodeAt(i)) >>> 0; }
+    return h % spread;
+  }
+
+  const processes = [
+    { id: nextId(), text: 'Drafting client compliance reports', target: 'augmented' },
+    { id: nextId(), text: 'Tracking regulatory deadlines', target: 'automated' },
+    { id: nextId(), text: 'Advising leadership on AI risk', target: 'unchanged' },
+    { id: nextId(), text: 'Summarizing new EU regulations', target: 'augmented' },
+    { id: nextId(), text: 'Filing quarterly emissions data', target: 'automated' },
+  ];
+
+  const newTasks = [
+    { id: nextId(), text: 'Reviewing AI-drafted regulatory summaries for accuracy' },
+    { id: nextId(), text: 'Auditing automated filings before submission' },
+  ];
+
+  processes.forEach(t => t.offset = hashOffset(t.id, 18));
+  newTasks.forEach(t => t.offset = hashOffset(t.id, 18));
+
+  let isExampleData = true;
+  let adoption = 0;
+  let playing = false;
+
+  const AUGMENT_ONSET = 10;
+  const AUTOMATE_ONSET = 45;
+  const NEWTASK_ONSET = 28;
+
+  // ---------- DOM refs ----------
+  const $ = id => document.getElementById(id);
+  const slider = $('adoptionSlider');
+  const stageLabel = $('stageLabel');
+  const stageNarrative = $('stageNarrative');
+  const playBtn = $('playBtn');
+  const resetBtn = $('resetBtn');
+  const taskInput = $('taskInput');
+  const addTaskBtn = $('addTaskBtn');
+  const newTaskInput = $('newTaskInput');
+  const addNewTaskBtn = $('addNewTaskBtn');
+  const clearExamples = $('clearExamples');
+  const exampleNote = $('exampleNote');
+
+  const listEls = {
+    unchanged: $('list-unchanged'),
+    augmented: $('list-augmented'),
+    automated: $('list-automated'),
+    new: $('list-new'),
+  };
+  const countEls = {
+    unchanged: $('count-unchanged'),
+    augmented: $('count-augmented'),
+    automated: $('count-automated'),
+    new: $('count-new'),
+  };
+
+  const cardEls = new Map(); // id -> DOM element
+
+  // ---------- Category logic ----------
+  function currentCategory(task){
+    if(task.target === 'unchanged') return 'unchanged';
+    const onset = (task.target === 'augmented' ? AUGMENT_ONSET : AUTOMATE_ONSET) + task.offset;
+    return adoption >= onset ? task.target : 'unchanged';
+  }
+
+  function newTaskVisible(task){
+    return adoption >= (NEWTASK_ONSET + task.offset);
+  }
+
+  // ---------- Stage narrative ----------
+  function updateStageText(){
+    let label, text;
+    if(adoption < 10){
+      label = 'Today';
+      text = "Nothing has changed yet. Every process runs exactly as it does now.";
+    } else if(adoption < 35){
+      label = 'Early adoption';
+      text = "AI starts assisting with the processes you marked to augment.";
+    } else if(adoption < 65){
+      label = 'Getting used to it';
+      text = "New oversight tasks appear, and augmentation spreads across the workflow.";
+    } else if(adoption < 90){
+      label = 'Scaling up';
+      text = "AI takes over the processes you marked to automate, freeing up your team's time.";
+    } else {
+      label = 'Fully adopted';
+      text = "Your team's work looks different: less manual execution, more oversight and judgment.";
+    }
+    stageLabel.textContent = label;
+    stageNarrative.textContent = text;
+  }
+
+  // ---------- Stacked bar ----------
+  function updateBar(){
+    const total = processes.length || 1;
+    const counts = { unchanged: 0, augmented: 0, automated: 0 };
+    processes.forEach(t => counts[currentCategory(t)]++);
+    $('seg-unchanged').style.width = (counts.unchanged/total*100) + '%';
+    $('seg-augmented').style.width = (counts.augmented/total*100) + '%';
+    $('seg-automated').style.width = (counts.automated/total*100) + '%';
+
+    const visibleNew = newTasks.filter(newTaskVisible).length;
+    $('newBadge').innerHTML = '<span class="mono">+' + visibleNew + '</span> new task' + (visibleNew === 1 ? '' : 's') + ' appearing';
+  }
+
+  // ---------- Card builders ----------
+  function buildProcessCard(task){
+    const el = document.createElement('div');
+    el.className = 'task-card';
+    el.dataset.id = task.id;
+
+    const txt = document.createElement('div');
+    txt.className = 'task-text';
+    txt.textContent = task.text;
+    el.appendChild(txt);
+
+    const controls = document.createElement('div');
+    controls.className = 'task-controls';
+
+    [['unchanged','Keep'], ['augmented','Augment'], ['automated','Automate']].forEach(([val, label]) => {
+      const b = document.createElement('button');
+      b.className = 'seg-btn';
+      b.dataset.t = val;
+      b.textContent = label;
+      b.addEventListener('click', () => {
+        task.target = val;
+        render();
+      });
+      controls.appendChild(b);
+    });
+
+    const rm = document.createElement('button');
+    rm.className = 'remove-btn';
+    rm.setAttribute('aria-label', 'Remove process');
+    rm.textContent = '\u00d7';
+    rm.addEventListener('click', () => {
+      const idx = processes.findIndex(t => t.id === task.id);
+      if(idx > -1) processes.splice(idx, 1);
+      const domEl = cardEls.get(task.id);
+      if(domEl) domEl.remove();
+      cardEls.delete(task.id);
+      render();
+    });
+    controls.appendChild(rm);
+
+    el.appendChild(controls);
+    cardEls.set(task.id, el);
+    return el;
+  }
+
+  function buildNewTaskCard(task){
+    const el = document.createElement('div');
+    el.className = 'task-card cat-new';
+    el.dataset.id = task.id;
+
+    const txt = document.createElement('div');
+    txt.className = 'task-text';
+    txt.textContent = task.text;
+    el.appendChild(txt);
+
+    const controls = document.createElement('div');
+    controls.className = 'task-controls';
+
+    const note = document.createElement('span');
+    note.className = 'pending-note';
+    note.textContent = '';
+    controls.appendChild(note);
+
+    const rm = document.createElement('button');
+    rm.className = 'remove-btn';
+    rm.setAttribute('aria-label', 'Remove new task');
+    rm.textContent = '\u00d7';
+    rm.addEventListener('click', () => {
+      const idx = newTasks.findIndex(t => t.id === task.id);
+      if(idx > -1) newTasks.splice(idx, 1);
+      const domEl = cardEls.get(task.id);
+      if(domEl) domEl.remove();
+      cardEls.delete(task.id);
+      render();
+    });
+    controls.appendChild(rm);
+
+    el.appendChild(controls);
+    cardEls.set(task.id, el);
+    return el;
+  }
+
+  // ---------- FLIP render ----------
+  function render(){
+    // 1. capture old positions
+    const oldRects = new Map();
+    cardEls.forEach((el, id) => {
+      if(el.isConnected) oldRects.set(id, el.getBoundingClientRect());
+    });
+
+    // 2. clear lists (detach, don't destroy)
+    Object.values(listEls).forEach(l => { l.innerHTML = ''; });
+
+    // 3. place process cards
+    const counts = { unchanged: 0, augmented: 0, automated: 0, new: 0 };
+    processes.forEach(task => {
+      const cat = currentCategory(task);
+      counts[cat]++;
+      let el = cardEls.get(task.id);
+      if(!el){ el = buildProcessCard(task); }
+      el.className = 'task-card' + (cat !== 'unchanged' ? ' cat-' + cat : '');
+      el.querySelectorAll('.seg-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.t === task.target);
+      });
+      listEls[cat].appendChild(el);
+    });
+
+    // 4. place new-task cards
+    newTasks.forEach(task => {
+      const visible = newTaskVisible(task);
+      let el = cardEls.get(task.id);
+      if(!el){ el = buildNewTaskCard(task); }
+      el.className = 'task-card cat-new' + (visible ? '' : ' pending');
+      const note = el.querySelector('.pending-note');
+      if(note) note.textContent = visible ? '' : 'appears later in the transition';
+      if(visible) counts.new++;
+      listEls.new.appendChild(el);
+    });
+
+    // 5. empty-state placeholders
+    Object.entries(listEls).forEach(([cat, l]) => {
+      if(l.children.length === 0){
+        const p = document.createElement('div');
+        p.className = 'bucket-empty';
+        p.textContent = cat === 'new' ? 'No new tasks yet.' : 'Nothing here yet.';
+        l.appendChild(p);
+      }
+    });
+
+    // 6. counts
+    Object.keys(countEls).forEach(cat => { countEls[cat].textContent = counts[cat]; });
+
+    // 7. FLIP animate
+    cardEls.forEach((el, id) => {
+      if(!el.isConnected) return;
+      const oldRect = oldRects.get(id);
+      if(!oldRect) return; // brand new card, let its own enter animation play
+      const newRect = el.getBoundingClientRect();
+      const dx = oldRect.left - newRect.left;
+      const dy = oldRect.top - newRect.top;
+      if(Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+      el.style.transition = 'none';
+      el.style.transform = `translate(${dx}px, ${dy}px)`;
+      requestAnimationFrame(() => {
+        el.style.transition = 'transform .5s var(--ease)';
+        el.style.transform = 'translate(0,0)';
+      });
+    });
+
+    updateStageText();
+    updateBar();
+  }
+
+  // ---------- Add / remove ----------
+  function addProcess(text){
+    if(!text.trim()) return;
+    processes.push({ id: nextId(), text: text.trim(), target: 'unchanged', offset: hashOffset('x'+uid, 18) });
+    render();
+  }
+  function addNewTask(text){
+    if(!text.trim()) return;
+    newTasks.push({ id: nextId(), text: text.trim(), offset: hashOffset('y'+uid, 18) });
+    render();
+  }
+
+  addTaskBtn.addEventListener('click', () => { addProcess(taskInput.value); taskInput.value = ''; taskInput.focus(); });
+  taskInput.addEventListener('keydown', e => { if(e.key === 'Enter'){ addProcess(taskInput.value); taskInput.value = ''; } });
+
+  addNewTaskBtn.addEventListener('click', () => { addNewTask(newTaskInput.value); newTaskInput.value = ''; newTaskInput.focus(); });
+  newTaskInput.addEventListener('keydown', e => { if(e.key === 'Enter'){ addNewTask(newTaskInput.value); newTaskInput.value = ''; } });
+
+  clearExamples.addEventListener('click', () => {
+    processes.length = 0;
+    newTasks.length = 0;
+    cardEls.forEach(el => el.remove());
+    cardEls.clear();
+    isExampleData = false;
+    exampleNote.style.display = 'none';
+    render();
+    taskInput.focus();
+  });
+
+  // ---------- Slider / play ----------
+  slider.addEventListener('input', () => {
+    adoption = Number(slider.value);
+    render();
+  });
+
+  resetBtn.addEventListener('click', () => {
+    stopPlaying();
+    adoption = 0;
+    slider.value = 0;
+    render();
+  });
+
+  let playRAF = null;
+  function stopPlaying(){
+    playing = false;
+    if(playRAF) cancelAnimationFrame(playRAF);
+    playBtn.textContent = 'Play the transition';
+    playBtn.disabled = false;
+  }
+
+  playBtn.addEventListener('click', () => {
+    if(playing) return;
+    playing = true;
+    playBtn.textContent = 'Playing…';
+    const start = adoption >= 99 ? 0 : adoption;
+    if(adoption >= 99){ adoption = 0; slider.value = 0; render(); }
+    const duration = 4200;
+    const t0 = performance.now();
+    function tick(now){
+      if(!playing) return;
+      const p = Math.min(1, (now - t0) / duration);
+      const eased = p < 0.5 ? 2*p*p : 1 - Math.pow(-2*p+2, 2)/2;
+      adoption = Math.round(start + (100 - start) * eased);
+      slider.value = adoption;
+      render();
+      if(p < 1){
+        playRAF = requestAnimationFrame(tick);
+      } else {
+        stopPlaying();
+      }
+    }
+    playRAF = requestAnimationFrame(tick);
+  });
+
+  // ---------- Initial render ----------
+  render();
+})();
+</script>
+
+</body>
+</html>
